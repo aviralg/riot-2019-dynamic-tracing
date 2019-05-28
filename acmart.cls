@@ -2251,7 +2251,7 @@ Computing Machinery]
 %%      \fancyfoot[LO,RE]{\ACM@timestamp}
 %%   \fi
 %% }
-\pagestyle{standardpagestyle}
+%% \pagestyle{standardpagestyle}
 \newdimen\@folio@wd
 \@folio@wd=\z@
 \newdimen\@folio@ht
