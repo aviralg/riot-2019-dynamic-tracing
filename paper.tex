@@ -63,7 +63,7 @@ coarse-grained \code{trace} function allowing one to only trace entry and exit
 points of R closures.
 
 In this talk we present \RDT, a scalable and modular dynamic tracing framework
-for that exposes all aspects of R, facilitating a fine-grained inspection of R
+that exposes many aspects of R, facilitating a fine-grained inspection of
 programs. It has two components:
 %
 \begin{compactitem}[$-$]
@@ -90,7 +90,7 @@ programs. It has two components:
 
 \bigskip
 \indent An actual dynamic analysis is separated from the framework in a
-standalone R package. This separation simplifies development and foster reuse.
+standalone R package. This separation simplifies development and fosters reuse.
 The package contains code that defines tracer state and registers callbacks for
 the relevant events. When a callback is triggered, it receives the tracer state
 together with the information about the event, \Ie, affected R objects along
@@ -100,8 +100,8 @@ includes the evaluation order of builtins and environment lookups through side
 channels without triggering callbacks. Furthermore, \RDT can detect recursion
 in callbacks, a consequence of the tracing algorithm inadvertently executing R
 code that potentially modifies the program state. This is a common stumbling
-block in naive tracing attempts and our design captures these cases, reporting
-them in meaningful error message. There is also an escape hatch in the form of
+block in na\"ive tracing attempts and our design captures these cases, reporting
+them as meaningful error message. There is also an escape hatch in the form of
 disabling specific probes when the R code in question is known to be benign.
 
 We have used RDT for a large-scale study of the design and use of laziness in
