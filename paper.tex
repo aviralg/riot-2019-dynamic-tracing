@@ -69,22 +69,32 @@ of debugging code at entry and exit points of R functions, it is too coarse
 grained to capture the whole range of dynamic features such as side effects,
 runtime code generation and dynamic dispatch. Our tracing framework builds upon
 this idea and exposes all these aspects of R, facilitating a fine-grained
-inspection of R programs. It comprises of two components:
+inspection of R programs. It has two components:
 \begin{compactitem}[$-$]
-\item \emph{RDT} is a modified R Virtual Machine. It adds probes (C callbacks)
-  that are executed when specific events happen on program execution. Currently,
-  the supported events are function entry and exit, variable mutation and
-  definition, garbage collection entry and exit, non-local jumps, promise
+\item \emph{RDT} is a GNU R Virtual Machine extended with probes (C functions)
+  that are triggered on specific program execution events. Dynamic analyses are
+  written as external R packages that register callbacks with these event probes.
+  Currently, the supported events are function entry and exit, variable mutation
+  and definition, garbage collection entry and exit, non-local jumps, promise
   creation and execution, eval entry and exit, S3 and S4 dispatch, etc. These
-  probes are exposed as an API through a C \code{struct} which also contains
-  an opaque pointer for storing arbitrary tracer state. This facilitates the
-  tracer to not create global state, encouraging a functional design.
-\item \emph{Dynalyzer} is an R package that provides a large scale map-reduce
-  style multistage data analysis pipeline with extensive logging and memoization
-  of intermediate analysis results. It also exports a collection of utilities to aid
-  common dynamic analysis tasks such as a data format for fast storing and
-  reading compressed binary streaming data and efficient computation of function
-  identity. Furthermore, it also exports functions for common graphing tasks.
+  probes, along with a facility to store arbitrary state per tracing session are
+  exposed as a small API. This extension to GNU R is quite small,
+  only 1,860 lines of code. The facility to store tracing session state
+  encourages a functional dynamic analysis design, by avoiding the need for
+  storing tracing state in global variables.
+
+\item \emph{Dynalyzer} is a companion R package that provides an eclectic mix of
+  tracing utilities. Primarily, it provides a collection of functions to build
+  large scale map-reduce analysis. This enables quick construction of multistage
+  pipelines for analysis of tracing data. The functions also automate logging and
+  memoization of partially analyzed data from each stage. Secondly, the package
+  provides a data format for fast storage and retrieval of dynamic analysis data.
+  This custom format supports fast streaming compression and decompression using
+  Facebook's \code{zstd} library. To enable fast loading of data in memory, the
+  format also stores the schema of the data table which enables preallocation of
+  data structure with correct shape and type of data columns. Finally, the package
+  exports functions for common graphing tasks.
+
 \end{compactitem}
 
 The actual tracing algorithm itself is written as an R package that installs
