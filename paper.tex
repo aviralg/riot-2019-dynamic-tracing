@@ -1,23 +1,47 @@
-\documentclass{article}
-\usepackage{geometry}
-\geometry{a4paper, margin=1in}
+\documentclass[acmsmall,review]{acmart}
+\settopmatter{printfolios=false,printccs=false,printacmref=false}
+\setcopyright{none}
+
+\usepackage[utf8]{inputenc}
+\usepackage{todonotes}
+\usepackage{paralist}
+\usepackage{listings}
+\usepackage{xspace}
+
+\lstset{ %
+  basicstyle=\small\ttfamily
+}
+
+\newcommand{\code}[1]{\lstinline|#1|\xspace}
 
 \title{A Dynamic Tracing Framework for R}
 
-\author{
-  Aviral Goel                                                          \\
-  Northeastern University, USA                                         \\
-  \texttt{goel.aviral@gmail.com}
-  \and
-  Filip Krikava                                                        \\
-  Czech Technical University, Czechia                                  \\
-  \texttt{krikava@gmail.com}
-  \and
-  Jan Vitek                                                            \\
-  Northeastern University, USA and Czech Technical University, Czechia \\
-  \texttt{j.vitek@northeastern.edu}}
+\author{Aviral Goel}
+\affiliation{
+  \institution{Northeastern University}
+  \country{Czech Republic}
+}
+\email{goel.aviral@gmail.com}
 
-\date{}
+\author{Filip Křikava}
+\affiliation{
+  \institution{Czech Technical University}
+  \country{Czechia}
+}
+\email{filip.krikava@fit.cvut.cz}
+
+\author{Jan Vitek}
+\affiliation{
+  \institution{Northeastern University}
+  \country{Czech Republic}
+}
+\affiliation{
+  \institution{Czech Technical University}
+  \country{Czechia}
+}
+\email{j.vitek@neu.edu}
+
+\authorsaddresses{}
 
 \begin{document}
 
@@ -26,8 +50,8 @@
 R occupies a unique place in the design spectrum of programming languages. It’s
 a dynamically typed, vectorized, lazy, side-effecting, object-oriented and
 functional programming language. Dynamic dispatch, reflection (capturing the
-call stack at runtime), first class environments, \texttt{eval}, metaprogramming
-using \texttt{substitute} and interop with C/C++, Java and Fortran enable programming
+call stack at runtime), first class environments, \code{eval}, metaprogramming
+using \code{substitute} and interop with C/C++, Java and Fortran enable programming
 idioms that make it nearly impossible to derive reliable insights by
 statically analyzing R code.
 
@@ -40,28 +64,28 @@ provides an interesting opportunity for the design of dynamic tracing framework
 for large scale language studies.
 
 In this talk we present a scalable, extensible and modular dynamic tracing
-framework for R. While R has a facility, \texttt{trace}, that supports injection
+framework for R. While R has a facility, \code{trace}, that supports injection
 of debugging code at entry and exit points of R functions, it is too coarse
 grained to capture the whole range of dynamic features such as side effects,
 runtime code generation and dynamic dispatch. Our tracing framework builds upon
 this idea and exposes all these aspects of R, facilitating a fine-grained
 inspection of R programs. It comprises of two components:
-\begin{itemize}
-\item \textbf{RDT} is a modified R Virtual Machine. It adds probes (C callbacks)
+\begin{compactitem}[$-$]
+\item \emph{RDT} is a modified R Virtual Machine. It adds probes (C callbacks)
   that are executed when specific events happen on program execution. Currently,
   the supported events are function entry and exit, variable mutation and
   definition, garbage collection entry and exit, non-local jumps, promise
   creation and execution, eval entry and exit, S3 and S4 dispatch, etc. These
-  probes are exposed as an API through a C \texttt{struct} which also contains
+  probes are exposed as an API through a C \code{struct} which also contains
   an opaque pointer for storing arbitrary tracer state. This facilitates the
   tracer to not create global state, encouraging a functional design.
-\item \textbf{Dynalyzer} is an R package that provides a large scale map-reduce
+\item \emph{Dynalyzer} is an R package that provides a large scale map-reduce
   style multistage data analysis pipeline with extensive logging and memoization
   of intermediate analysis results. It also exports a collection of utilities to aid
   common dynamic analysis tasks such as a data format for fast storing and
   reading compressed binary streaming data and efficient computation of function
   identity. Furthermore, it also exports functions for common graphing tasks.
-\end{itemize}
+\end{compactitem}
 
 The actual tracing algorithm itself is written as an R package that installs
 with RDT. This tracer package registers callbacks for the relevant events
@@ -89,6 +113,5 @@ understanding program behavior, language usage patterns and performance enabled
 by our framework can help improve the design of existing features, drive the
 design of new language features and provide inspiration for the design of better
 libraries.
-
 
 \end{document}
