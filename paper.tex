@@ -47,21 +47,16 @@
 
 \maketitle
 
-R occupies a unique place in the design spectrum of programming languages. It’s
-a dynamically typed, vectorized, lazy, side-effecting, object-oriented and
-functional programming language. Dynamic dispatch, reflection (capturing the
-call stack at runtime), first class environments, \code{eval}, metaprogramming
-using \code{substitute} and interop with C/C++, Java and Fortran enable programming
-idioms that make it nearly impossible to derive reliable insights by
-statically analyzing R code.
-
-While static analysis of program behavior is far from reach, the availability of
-over 16K R packages from CRAN and Bioconductor with runnable programs in the
-form of test cases, examples and vignettes motivates the application of dynamic
-analysis approaches to solve the same problems. Altogether, the packages contain
-XXX lines of executable R code and YYYY lines of executable C/C++ code. This
-provides an interesting opportunity for the design of dynamic tracing framework
-for large scale language studies.
+Static analysis of R code is hard. A combination of dynamic typing, laziness
+with side-effects, introspection, metaprogramming using \code{substitute},
+first-class environments and \code{eval} enable programming idioms that make it
+nearly impossible to statically derive reliable insights. While static analysis
+of program behavior is far from reach, the availability of over 16K R packages
+from CRAN and Bioconductor with runnable programs in the form of test cases,
+examples and vignettes motivates the application of dynamic analysis approaches
+to solve the same problems. Altogether, the packages contain XXX lines of R code
+and YYYY lines of C/C++ code. This provides an interesting opportunity for the
+design of dynamic tracing framework for large scale language studies.
 
 In this talk we present a scalable, extensible and modular dynamic tracing
 framework for R. While R has a facility, \code{trace}, that supports injection
