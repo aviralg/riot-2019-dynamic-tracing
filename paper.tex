@@ -13,6 +13,8 @@
 }
 
 \newcommand{\code}[1]{\lstinline|#1|\xspace}
+\newcommand{\Ie}{\emph{i.e.}\xspace}
+\newcommand{\RDT}{RDT\xspace}
 
 \title{A Dynamic Tracing Framework for R}
 
@@ -50,73 +52,65 @@
 Static analysis of R code is hard. A combination of dynamic typing, laziness
 with side-effects, introspection, metaprogramming using \code{substitute},
 first-class environments and \code{eval} enable programming idioms that make it
-nearly impossible to statically derive reliable insights. While static analysis
-of program behavior is far from reach, the availability of over 16K R packages
-from CRAN and Bioconductor with runnable programs in the form of test cases,
-examples and vignettes motivates the application of dynamic analysis approaches
-to solve the same problems. Altogether, the packages contain XXX lines of R code
-and YYYY lines of C/C++ code. This provides an interesting opportunity for the
-design of dynamic tracing framework for large scale language studies.
+nearly impossible to statically derive reliable insights. On the other hand,
+most of the R packages available in CRAN and Bioconductor contain runnable
+programs in the form of examples, tests and vignettes\footnote{The XXK CRAN
+  packages contains YYK lines of runnable R code}. This makes R well-suited for
+approaches based on dynamic analysis.
+%
+However, currently there is no dynamic tracing facilities other than the
+coarse-grained \code{trace} function allowing one to only trace entry and exit
+points of R closures.
 
-In this talk we present a scalable, extensible and modular dynamic tracing
-framework for R. While R has a facility, \code{trace}, that supports injection
-of debugging code at entry and exit points of R functions, it is too coarse
-grained to capture the whole range of dynamic features such as side effects,
-runtime code generation and dynamic dispatch. Our tracing framework builds upon
-this idea and exposes all these aspects of R, facilitating a fine-grained
-inspection of R programs. It has two components:
+In this talk we present \RDT, a scalable and modular dynamic tracing framework
+for that exposes all aspects of R, facilitating a fine-grained inspection of R
+programs. It has two components:
+%
 \begin{compactitem}[$-$]
-\item \emph{RDT} is a GNU R Virtual Machine extended with probes (C functions)
-  that are triggered on specific program execution events. Dynamic analyses are
-  written as external R packages that register callbacks with these event probes.
-  Currently, the supported events are function entry and exit, variable mutation
-  and definition, garbage collection entry and exit, non-local jumps, promise
-  creation and execution, eval entry and exit, S3 and S4 dispatch, etc. These
-  probes, along with a facility to store arbitrary state per tracing session are
-  exposed as a small API. This extension to GNU R is quite small,
-  only 1,860 lines of code. The facility to store tracing session state
-  encourages a functional dynamic analysis design, by avoiding the need for
-  storing tracing state in global variables.
-
-\item \emph{Dynalyzer} is a companion R package that provides an eclectic mix of
-  tracing utilities. Primarily, it provides a collection of functions to build
-  large scale map-reduce analysis. This enables quick construction of multistage
-  pipelines for analysis of tracing data. The functions also automate logging and
-  memoization of partially analyzed data from each stage. Secondly, the package
-  provides a data format for fast storage and retrieval of dynamic analysis data.
-  This custom format supports fast streaming compression and decompression using
-  Facebook's \code{zstd} library. To enable fast loading of data in memory, the
-  format also stores the schema of the data table which enables preallocation of
-  data structure with correct shape and type of data columns. Finally, the package
-  exports functions for common graphing tasks.
-
+\item a extension to GNU R Virtual Machine with probes that are triggered on
+  specific program execution events. Dynamic analyses are written as external R
+  packages that register callbacks to these probes. \RDT includes a number of
+  probes such as function entry and exit, variable mutation and definition,
+  garbage collection entry and exit, non-local jumps, promise creation and
+  execution, eval entry and exit, S3 and S4 dispatch. These probes, along with
+  a facility to store arbitrary state per tracing session are exposed as a
+  small API\footnote{The complete extension to the virtual machine is about 1.8K lines
+    of C code.}
+  %The ability to store tracing session state avoids the need to use
+  %global variables and thus encourages a functional design of dynamic analysis
+  %that is easier to reason about.
+\item a companion R package that provides an eclectic mix of functions for
+  building scalable dynamic analyses using map-reduce programming model. This
+  enables quick construction of multistage pipelines for analysis of tracing
+  data. It contains functions to automate logging and memoization of partially
+  analyzed data from each stage. Finally, it defines a data format for fast
+  storage and retrieval of collected data with support for compressed data
+  streaming.
 \end{compactitem}
 
-The actual tracing algorithm itself is written as an R package that installs
-with RDT. This tracer package registers callbacks for the relevant events
-through the \texttt{struct} exposed by \texttt{RDT}. When callback is triggered,
-it is passed the tracer state as an argument along with the information about
-the event. This information generally comprises of affected R objects along with
-the relevant interpreter state. \texttt{RDT} also exports utility functions to
-access fields of these objects and global R interpreter state such as the
-evaluation order of builtins, or a side-channel function to lookup environments
-without triggering callbacks. Furthermore, \texttt{RDT} can detect recursion in
-callbacks, a consequence of the tracing algorithm inadvertently executing R code
-that potentially modifies the program state. This is a common stumbling block in
-many a tracing attempts and our design captures these cases and reports a
-meaningful error message. Furthermore, \texttt{RDT} also provides an escape
-hatch in the form of disabling specific probes when the R code in question is
-known to be benign. Separation of the tracing framework into separate
-packages/components that access each other via well-defined API facilitates easy
-development and reuse.
+\bigskip
+\indent An actual dynamic analysis is separated from the framework in a
+standalone R package. This separation simplifies development and foster reuse.
+The package contains code that defines tracer state and registers callbacks for
+the relevant events. When a callback is triggered, it receives the tracer state
+together with the information about the event, \Ie, affected R objects along
+with the relevant R interpreter state. A part of the API are utilities to
+access fields of these objects as well as the global R interpreter state. This
+includes the evaluation order of builtins and environment lookups through side
+channels without triggering callbacks. Furthermore, \RDT can detect recursion
+in callbacks, a consequence of the tracing algorithm inadvertently executing R
+code that potentially modifies the program state. This is a common stumbling
+block in naive tracing attempts and our design captures these cases, reporting
+them in meaningful error message. There is also an escape hatch in the form of
+disabling specific probes when the R code in question is known to be benign.
 
-We have used framework for a large scale study of the design and use of
-laziness in R. Our design enabled us to track over XXXX Billion promises and
-XXXX Billion events providing very reliable data-oriented understanding of
-the role of laziness in real world R code. We believe that this approach of
-understanding program behavior, language usage patterns and performance enabled
-by our framework can help improve the design of existing features, drive the
-design of new language features and provide inspiration for the design of better
-libraries.
-
+We have used RDT for a large-scale study of the design and use of laziness in
+R. Thanks to RDT, we managed to scale the dynamic analysis to YYYY R packages,
+tracking over XXXXbn promises and XXXXbn events. The result is a reliable,
+data-oriented understanding of the role of laziness in real-world R code.
+%
+We believe that using such approach of understanding program behavior, language
+usage patterns and performance enabled by RDT is beneficial. It can help
+improve the design of existing features, drive the design of new language
+features and provide inspiration for the design of better libraries.
 \end{document}
