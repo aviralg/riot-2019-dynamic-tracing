@@ -71,24 +71,23 @@ that exposes many aspects of R, facilitating a fine-grained inspection of
 programs. It has two components:
 %
 \begin{compactitem}[$-$]
-\item \emph{\RDyntrace} is an extension to GNU R Virtual Machine with probes
-  that are triggered on specific program execution events. Dynamic analyses are
-  written as external R packages that register callbacks to these probes. \RDyntrace
-  includes a number of probes such as function entry and exit, variable mutation
-  and definition, garbage collection entry and exit, non-local jumps, promise
-  creation and execution, eval entry and exit, S3 and S4 dispatch. These probes,
-  along with a facility to store arbitrary state per tracing session are exposed
-  as a small API\footnote{The complete extension to the virtual machine is about
-    1.8K lines of C code.}
+\item \emph{\RDyntrace} is a small extension\footnote{The complete extension to
+  the virtual machine is about 1.8K lines of C code.} to GNU R Virtual Machine
+  with probes that are triggered on specific program execution events. There is
+  a number of probes such as function entry and exit, variable definition and
+  mutation, garbage collection entry and exit, non-local jumps, promise
+  creation and execution, eval entry and exit, and S3/S4 dispatch. \RDyntrace
+  provides an API to register user-defined callbacks to these probes along with
+  a facility to store arbitrary state per tracing session.
   %The ability to store tracing session state avoids the need to use
   %global variables and thus encourages a functional design of dynamic analysis
   %that is easier to reason about.
 \item \emph{\dynalyzer} is a companion R package that provides utilities for
-  data-intensive dynamic analysis studies. The package facilitates quick
+  building data-intensive dynamic analyses. The package facilitates quick
   construction of multistage pipeline for analysis of tracing data using the
   map-reduce programming model. It contains functions to automate logging and
-  memoization of partially analyzed data from each stage. It also defines a data
-  format for fast storage and retrieval of collected data with support for
+  memoization of partially analyzed data from each stage. It also defines a
+  data format for fast storage and retrieval of collected data with support for
   compression and streaming.
 \end{compactitem}
 
