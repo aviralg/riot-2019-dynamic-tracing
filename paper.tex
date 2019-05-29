@@ -58,9 +58,9 @@ with side-effects, introspection, metaprogramming, first-class environments and
 \code{eval} enable programming idioms that make it nearly impossible to
 statically derive reliable insights. Fortunately, most of the R packages
 available in CRAN and Bioconductor contain runnable programs in the form of
-examples, tests and vignettes\footnote{The XXK CRAN packages contains YYK lines
-of runnable R code} which makes the language well-suited for approaches based on
-dynamic analysis.
+examples, tests and vignettes\footnote{The packages contain approximately 4.4M
+lines of runnable R code} which makes the language well-suited for approaches
+based on dynamic analysis.
 %
 However, currently there is no dynamic tracing functionality in R other than the
 coarse-grained \code{trace} function which only allows tracing the entry and exit
@@ -73,8 +73,8 @@ programs. It has two components:
 \begin{compactitem}[$-$]
 \item \emph{\RDyntrace} is a small extension\footnote{The complete extension to
   the virtual machine is about 1.8K lines of C code.} to GNU R Virtual Machine
-  with probes that are triggered on specific program execution events. There is
-  a number of probes such as function entry and exit, variable definition and
+  with probes that are triggered on specific program execution events. There are
+  probes for function entry and exit, variable definition and
   mutation, garbage collection entry and exit, non-local jumps, promise
   creation and execution, eval entry and exit, and S3/S4 dispatch. \RDyntrace
   provides an API to register user-defined callbacks to these probes along with
@@ -92,7 +92,7 @@ programs. It has two components:
 \end{compactitem}
 
 %\bigskip
-\indent An actual dynamic analysis is written as a standalone R package. This
+\indent An actual dynamic analysis is written as a standalone R package. Its
 separation from the framework simplifies development and fosters reuse. The
 package contains code that defines tracer state and registers callbacks for the
 relevant events. When a callback is triggered, it receives the tracer state
@@ -108,9 +108,10 @@ meaningful error message. There is also an escape hatch in the form of disabling
 specific probes when the R code in question is known to be benign.
 
 We have used \RDT for a large-scale study of the design and use of laziness in
-R. Its design has enabled us to scale the dynamic analysis to YYYY R packages,
-tracking over XXXXbn promises and XXXXbn events. The result is a comprehensive,
-data-oriented understanding of the role of laziness in real-world R code.
+R. Its design has enabled us to scale the dynamic analysis to 14,875 R packages,
+tracking over 177.8 B promises and 3.5 T events at the rate of 1.5 M events per
+second. The result is a comprehensive, data-oriented understanding of the role
+of laziness in real-world R code.
 
 \RDT enables a data-driven approach to understanding R program behavior and
 language usage patterns. We believe this approach is instrumental in providing
