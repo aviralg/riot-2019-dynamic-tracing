@@ -15,8 +15,10 @@
 \newcommand{\code}[1]{\lstinline|#1|\xspace}
 \newcommand{\Ie}{\emph{i.e.}\xspace}
 \newcommand{\RDT}{RDT\xspace}
+\newcommand{\RDyntrace}{R-dyntrace\xspace}
+\newcommand{\dynalyzer}{dynalyzer\xspace}
 
-\title{A Dynamic Tracing Framework for R}
+\title{RDT: A Dynamic Tracing Framework for R}
 
 \author{Aviral Goel}
 \affiliation{
@@ -49,17 +51,19 @@
 
 \maketitle
 
+\vspace{-1mm}
+
 Static analysis of R code is hard. A combination of dynamic typing, laziness
-with side-effects, introspection, metaprogramming using \code{substitute},
-first-class environments and \code{eval} enable programming idioms that make it
-nearly impossible to statically derive reliable insights. On the other hand,
-most of the R packages available in CRAN and Bioconductor contain runnable
-programs in the form of examples, tests and vignettes\footnote{The XXK CRAN
-  packages contains YYK lines of runnable R code}. This makes R well-suited for
-approaches based on dynamic analysis.
+with side-effects, introspection, metaprogramming, first-class environments and
+\code{eval} enable programming idioms that make it nearly impossible to
+statically derive reliable insights. Fortunately, most of the R packages
+available in CRAN and Bioconductor contain runnable programs in the form of
+examples, tests and vignettes\footnote{The XXK CRAN packages contains YYK lines
+of runnable R code} which makes the language well-suited for approaches based on
+dynamic analysis.
 %
-However, currently there is no dynamic tracing facilities other than the
-coarse-grained \code{trace} function allowing one to only trace entry and exit
+However, currently there is no dynamic tracing functionality in R other than the
+coarse-grained \code{trace} function which only allows tracing the entry and exit
 points of R closures.
 
 In this talk we present \RDT, a scalable and modular dynamic tracing framework
@@ -67,50 +71,50 @@ that exposes many aspects of R, facilitating a fine-grained inspection of
 programs. It has two components:
 %
 \begin{compactitem}[$-$]
-\item a extension to GNU R Virtual Machine with probes that are triggered on
-  specific program execution events. Dynamic analyses are written as external R
-  packages that register callbacks to these probes. \RDT includes a number of
-  probes such as function entry and exit, variable mutation and definition,
-  garbage collection entry and exit, non-local jumps, promise creation and
-  execution, eval entry and exit, S3 and S4 dispatch. These probes, along with
-  a facility to store arbitrary state per tracing session are exposed as a
-  small API\footnote{The complete extension to the virtual machine is about 1.8K lines
-    of C code.}
+\item \emph{\RDyntrace} is an extension to GNU R Virtual Machine with probes
+  that are triggered on specific program execution events. Dynamic analyses are
+  written as external R packages that register callbacks to these probes. \RDyntrace
+  includes a number of probes such as function entry and exit, variable mutation
+  and definition, garbage collection entry and exit, non-local jumps, promise
+  creation and execution, eval entry and exit, S3 and S4 dispatch. These probes,
+  along with a facility to store arbitrary state per tracing session are exposed
+  as a small API\footnote{The complete extension to the virtual machine is about
+    1.8K lines of C code.}
   %The ability to store tracing session state avoids the need to use
   %global variables and thus encourages a functional design of dynamic analysis
   %that is easier to reason about.
-\item a companion R package that provides an eclectic mix of functions for
-  building scalable dynamic analyses using map-reduce programming model. This
-  enables quick construction of multistage pipelines for analysis of tracing
-  data. It contains functions to automate logging and memoization of partially
-  analyzed data from each stage. Finally, it defines a data format for fast
-  storage and retrieval of collected data with support for compressed data
-  streaming.
+\item \emph{\dynalyzer} is a companion R package that provides utilities for
+  data-intensive dynamic analysis studies. The package facilitates quick
+  construction of multistage pipeline for analysis of tracing data using the
+  map-reduce programming model. It contains functions to automate logging and
+  memoization of partially analyzed data from each stage. It also defines a data
+  format for fast storage and retrieval of collected data with support for
+  compression and streaming.
 \end{compactitem}
 
-\bigskip
-\indent An actual dynamic analysis is separated from the framework in a
-standalone R package. This separation simplifies development and fosters reuse.
-The package contains code that defines tracer state and registers callbacks for
-the relevant events. When a callback is triggered, it receives the tracer state
+%\bigskip
+\indent An actual dynamic analysis is written as a standalone R package. This
+separation from the framework simplifies development and fosters reuse. The
+package contains code that defines tracer state and registers callbacks for the
+relevant events. When a callback is triggered, it receives the tracer state
 together with the information about the event, \Ie, affected R objects along
-with the relevant R interpreter state. A part of the API are utilities to
-access fields of these objects as well as the global R interpreter state. This
-includes the evaluation order of builtins and environment lookups through side
-channels without triggering callbacks. Furthermore, \RDT can detect recursion
-in callbacks, a consequence of the tracing algorithm inadvertently executing R
-code that potentially modifies the program state. This is a common stumbling
-block in na\"ive tracing attempts and our design captures these cases, reporting
-them as meaningful error message. There is also an escape hatch in the form of
-disabling specific probes when the R code in question is known to be benign.
+with the relevant R interpreter state. A part of the API are utilities to access
+fields of these objects as well as the global R interpreter state such as the
+evaluation order of builtin function arguments and variable lookup without
+triggering callbacks. Furthermore, \RDyntrace can detect recursion in callbacks,
+a consequence of the tracing algorithm inadvertently executing R code that
+potentially modifies the program state. This is a common stumbling block in
+na\"ive tracing attempts and our design captures these cases, reporting them as
+meaningful error message. There is also an escape hatch in the form of disabling
+specific probes when the R code in question is known to be benign.
 
 We have used RDT for a large-scale study of the design and use of laziness in
-R. Thanks to RDT, we managed to scale the dynamic analysis to YYYY R packages,
-tracking over XXXXbn promises and XXXXbn events. The result is a reliable,
+R. Our des has enabled us to scale the dynamic analysis to YYYY R packages,
+tracking over XXXXbn promises and XXXXbn events. The result is a comprehensive,
 data-oriented understanding of the role of laziness in real-world R code.
-%
-We believe that using such approach of understanding program behavior, language
-usage patterns and performance enabled by RDT is beneficial. It can help
-improve the design of existing features, drive the design of new language
-features and provide inspiration for the design of better libraries.
+
+\RDT enables a data-driven approach to understanding R program behavior and
+language usage patterns. We believe this approach is instrumental in providing
+insights for improving the design of existing features and driving the design of
+new features and better libraries for the dynamic languages of today.
 \end{document}
