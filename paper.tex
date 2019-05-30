@@ -1,4 +1,4 @@
-\documentclass[acmsmall,review]{acmart}
+\documentclass[acmsmall]{acmart}
 \settopmatter{printfolios=false,printccs=false,printacmref=false}
 \setcopyright{none}
 
@@ -92,20 +92,20 @@ programs. It has two components:
 \end{compactitem}
 
 %\bigskip
-\indent An actual dynamic analysis is written as a standalone R package. Its
-separation from the framework simplifies development and fosters reuse. The
-package contains code that defines tracer state and registers callbacks for the
-relevant events. When a callback is triggered, it receives the tracer state
-together with the information about the event, \Ie, affected R objects along
-with the relevant R interpreter state. \RDyntrace API exports utilities to access
-fields of these objects as well as the global R interpreter state such as the
-evaluation order of builtin function arguments and variable lookup without
-triggering callbacks. Furthermore, \RDyntrace can detect nesting in callbacks,
-a consequence of the tracing algorithm inadvertently executing R code that
-potentially modifies the program state. This is a common stumbling block in
-na\"ive tracing attempts and our design captures these cases, reporting them as
-meaningful error message. There is also an escape hatch in the form of disabling
-specific probes when the R code in question is known to be benign.
+\indent A dynamic analysis is written as a standalone R package. Its separation
+from the framework simplifies development and fosters reuse. It contains code
+that defines tracer state and registers callbacks for relevant events. When a
+callback is triggered, it receives the tracer state and information about the
+event, \Ie, affected R objects and the relevant R interpreter state. \RDyntrace
+API exports utilities to access fields of these objects as well as the global R
+interpreter state such as the evaluation order of builtin function arguments and
+variable lookup without triggering callbacks. Furthermore, \RDyntrace can detect
+nesting in callbacks, a consequence of the tracing algorithm inadvertently
+executing R code that potentially modifies the program state. This is a common
+stumbling block in na\"ive tracing attempts and our design captures these cases,
+reporting them as meaningful error message. There is also an escape hatch in the
+form of disabling specific probes when the R code in question is known to be
+benign.
 
 We have used \RDT for a large-scale study of the design and use of laziness in
 R. Its design has enabled us to scale the dynamic analysis to 14,875 R packages,
